@@ -140,6 +140,30 @@ int main()
             }
         }
 
+        // Options window event loop
+        sf::Event OptionsEvent;
+        while (ColourPickerWindow.pollEvent(OptionsEvent))
+        {
+            if (OptionsEvent.type == sf::Event::Closed)
+            {
+                // Closes on X click - sometimes modified for close confirmation
+                ColourPickerWindow.close();
+            }
+
+            // This is useful for stamping
+            if (OptionsEvent.type == sf::Event::MouseButtonPressed)
+            {
+                if (OptionsEvent.mouseButton.button == sf::Mouse::Left)
+                {
+                    ColourPickerColour = ColourPickerImage.getPixel(sf::Mouse::getPosition(ColourPickerWindow).x, sf::Mouse::getPosition(ColourPickerWindow).y);
+
+                    g_CanvasManager.UpdateColour(ColourPickerColour);
+                }
+            }
+        }
+        //
+
+
         // Menu window event loop
         sf::Event MenuEvent;
         while (MenuRenderWindow.pollEvent(MenuEvent))
