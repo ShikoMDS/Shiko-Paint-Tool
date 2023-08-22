@@ -7,7 +7,7 @@
 #include "GUI/UIElement.h"
 #include "GUI/Camera.h"
 #include "GUI/Menu.h"
-#include "Utensils/CanvasManager.h"
+#include "Utensils/ToolManager.h"
 #include "Utensils/FileManager.h"
 
 // ALWAYS BUILD IN RELEASE AT LEAST ONCE A DAY
@@ -15,81 +15,133 @@
 int main()
 {
     sf::Color ColourPickerColour;
+    float outlineSize = 0.0f;
 
-    // Main window creation
-    sf::RenderWindow MainRenderWindow(sf::VideoMode(1600, 900), "Shiko Paint Tool");
-    MainRenderWindow.setFramerateLimit(60); // Sets to 60 fps
+    // Window renders ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //* Canvas window creation *//
+    sf::RenderWindow CanvasWindow(sf::VideoMode(1600, 900), "Shiko Paint Tool");
+    CanvasWindow.setFramerateLimit(60); // Sets to 60 fps
 
-	FileManager g_FileManager(MainRenderWindow.getSystemHandle());
+	FileManager g_FileManager(CanvasWindow.getSystemHandle());
+    Camera MainCamera(sf::Vector2f(CanvasWindow.getSize().x / 2, CanvasWindow.getSize().y / 2), sf::Vector2f(CanvasWindow.getSize().x, CanvasWindow.getSize().y));
+    //
 
-	// Colour Picker window creation
-    sf::RenderWindow ColourPickerWindow(sf::VideoMode(400, 400), "Colour Picker");
-    ColourPickerWindow.setVerticalSyncEnabled(true); // Sets to monitor refresh rate
+	//* Colour Picker window creation *//
+    sf::RenderWindow FillColourWindow(sf::VideoMode(395, 390), "Fill Colour", sf::Style::Titlebar);
+    sf::RenderWindow OutlineColourWindow(sf::VideoMode(395, 390), "Outline Colour", sf::Style::Titlebar);
+    FillColourWindow.setVerticalSyncEnabled(true);
+    OutlineColourWindow.setVerticalSyncEnabled(true);
 
-    sf::RectangleShape OptionsShape;
-    OptionsShape.setSize(sf::Vector2f(ColourPickerWindow.getSize().x, ColourPickerWindow.getSize().y));
-    sf::Texture OptionsTexture;
-    OptionsTexture.loadFromFile("Resources/Images/Colours.png");
-    if (!OptionsTexture.loadFromFile("Resources/Images/Colours.png"))
+    sf::RectangleShape ColourShape;
+    ColourShape.setSize(sf::Vector2f(FillColourWindow.getSize().x, FillColourWindow.getSize().y));
+    ColourShape.setSize(sf::Vector2f(OutlineColourWindow.getSize().x, OutlineColourWindow.getSize().y));
+    sf::Texture ColourTexture;
+    ColourTexture.loadFromFile("Resources/Images/Colours.png");
+    if (!ColourTexture.loadFromFile("Resources/Images/Colours.png"))
     {
         std::cout << "Failed to load colour selection tool!" << std::endl;
     }
-
-    OptionsShape.setTexture(&OptionsTexture);
-
+    ColourShape.setTexture(&ColourTexture);
     sf::Image ColourPickerImage;
     ColourPickerImage.loadFromFile("Resources/Images/Colours.png");
     //
+    
 
-    // Menu window creation
-    sf::RenderWindow MenuRenderWindow(sf::VideoMode(400, 900), "Menu");
-    MenuRenderWindow.setVerticalSyncEnabled(true);
-    //
+    //* Menu window creation *//
+    sf::RenderWindow MenuWindow(sf::VideoMode(400, 900), "Menu", sf::Style::Close);
+    MenuWindow.setVerticalSyncEnabled(true);
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     
 
 
-    Camera MainCamera(sf::Vector2f(MainRenderWindow.getSize().x / 2, MainRenderWindow.getSize().y / 2), sf::Vector2f(MainRenderWindow.getSize().x, MainRenderWindow.getSize().y));
 
-    // Canvas stuff
+    // Canvas stuff ---------------------------------------------------------------------------------------
     sf::RenderTexture* g_Canvas = new sf::RenderTexture();
-    g_Canvas->create(MainRenderWindow.getSize().x, MainRenderWindow.getSize().y);
+    g_Canvas->create(CanvasWindow.getSize().x, CanvasWindow.getSize().y);
     g_Canvas->clear(sf::Color::White);
 
     sf::RectangleShape g_CanvasObject;
-    g_CanvasObject.setSize(sf::Vector2f(MainRenderWindow.getSize().x, MainRenderWindow.getSize().y));
+    g_CanvasObject.setSize(sf::Vector2f(CanvasWindow.getSize().x, CanvasWindow.getSize().y));
     g_CanvasObject.setTexture(&g_Canvas->getTexture());
-    //
 
     // Canvas manager init
-    CanvasManager g_CanvasManager(g_Canvas, &MainRenderWindow);
+    ToolManager g_CanvasManager(g_Canvas, &CanvasWindow);
     //
 
     // Delta time stuff
-    float DeltaTime = 0.0f;
     sf::Time CurrentTime;
     sf::Clock DeltaClock;
+    //----------------------------------------------------------------------------------------------------
 
-    //
 
+    // Menu buttons ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     sf::Font* UIElementFont = new sf::Font;
     if (!UIElementFont->loadFromFile("Resources/Fonts/Inkfree.ttf"))
     {
         std::cout << "Error loading file" << std::endl;
     }
-
+    
     std::vector <UIElement> UIElements;
 
-    while (MenuRenderWindow.isOpen())
+    std::map<ButtonType, std::string> ToolNames = {
+        {ButtonType::Pointer, "  Pointer "},
+        {ButtonType::Box, "    Box "},
+        {ButtonType::Ellipse, "   Ellipse "},
+        {ButtonType::Line, "    Line "},
+    };
+
+    for (int i = 0; i < 4; i++)
     {
-        CurrentTime = DeltaClock.restart();
+        UIElement NewElement(sf::Vector2f(20, 70 + (i * 55)), sf::Vector2f(140, 35), ToolNames[static_cast<ButtonType>(i)] + '(' + std::to_string(i + 1) + ')', UIElementFont, &g_CanvasManager);
+        UIElements.push_back(NewElement);
+        UIElements.back().CurrentButtonType = static_cast<ButtonType>(i);
+        UIElements.at(0).IsActive = true;
+    }
+
+    std::vector<ButtonType>ButtonType = {
+        ButtonType::Pointer,
+        ButtonType::Box,
+        ButtonType::Ellipse,
+        ButtonType::Line,
+    };
+    
+    for (int i = 0; i < UIElements.size(); i++)
+    {
+        UIElements.at(i).CurrentButtonType = ButtonType.at(i);
+    }
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    while (MenuWindow.isOpen())
+    {
+	    float DeltaTime = 0.0f;
+	    CurrentTime = DeltaClock.restart();
         DeltaTime = CurrentTime.asSeconds();
 
         sf::Event CanvasEvent;
-        while (MainRenderWindow.pollEvent(CanvasEvent))
+        while (CanvasWindow.pollEvent(CanvasEvent))
         {
             if (CanvasEvent.type == sf::Event::Closed)
             {
-                MainRenderWindow.close();
+                if (showConfirmationDialog(CanvasWindow))
+                {
+                    CanvasWindow.close();
+                    MenuWindow.close();
+                }
+            }
+
+            if (CanvasEvent.type == sf::Event::MouseWheelScrolled)
+            {
+                if (CanvasEvent.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+                {
+                    if (CanvasEvent.mouseWheelScroll.delta < 0) // Scroll down to zoom out
+                    {
+                        MainCamera.m_CameraView.zoom(1.1f); // Adjust this value to control zoom speed
+                    }
+                    else if (CanvasEvent.mouseWheelScroll.delta > 0) // Scroll up to zoom in
+                    {
+                        MainCamera.m_CameraView.zoom(0.9f); // Adjust this value to control zoom speed
+                    }
+                }
             }
 
             if (CanvasEvent.type == sf::Event::MouseButtonPressed && CanvasEvent.mouseButton.button == sf::Mouse::Left)
@@ -123,41 +175,35 @@ int main()
                     g_Canvas->draw(NewShape);
 	            }
             }
+        }
 
-            if (CanvasEvent.type == sf::Event::MouseWheelScrolled)
+        // Options window event loop
+        sf::Event ColourEvent;
+        while (FillColourWindow.pollEvent(ColourEvent))
+        {
+            // Colour selection fill
+            if (ColourEvent.type == sf::Event::MouseButtonPressed)
             {
-                if (CanvasEvent.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
+                if (ColourEvent.mouseButton.button == sf::Mouse::Left)
                 {
-                    if (CanvasEvent.mouseWheelScroll.delta < 0) // Scroll down to zoom out
-                    {
-                        MainCamera.m_CameraView.zoom(1.1f); // Adjust this value to control zoom speed
-                    }
-                    else if (CanvasEvent.mouseWheelScroll.delta > 0) // Scroll up to zoom in
-                    {
-                        MainCamera.m_CameraView.zoom(0.9f); // Adjust this value to control zoom speed
-                    }
+                    ColourPickerColour = ColourPickerImage.getPixel(sf::Mouse::getPosition(FillColourWindow).x, sf::Mouse::getPosition(FillColourWindow).y);
+
+                    g_CanvasManager.UpdateColourFill(ColourPickerColour);
                 }
             }
         }
 
-        // Options window event loop
-        sf::Event OptionsEvent;
-        while (ColourPickerWindow.pollEvent(OptionsEvent))
+    	sf::Event OutlineEvent;
+        while (OutlineColourWindow.pollEvent(OutlineEvent))
         {
-            if (OptionsEvent.type == sf::Event::Closed)
+            // Colour selection ouline
+            if (OutlineEvent.type == sf::Event::MouseButtonPressed)
             {
-                // Closes on X click - sometimes modified for close confirmation
-                ColourPickerWindow.close();
-            }
-
-            // This is useful for stamping
-            if (OptionsEvent.type == sf::Event::MouseButtonPressed)
-            {
-                if (OptionsEvent.mouseButton.button == sf::Mouse::Left)
+                if (OutlineEvent.mouseButton.button == sf::Mouse::Left)
                 {
-                    ColourPickerColour = ColourPickerImage.getPixel(sf::Mouse::getPosition(ColourPickerWindow).x, sf::Mouse::getPosition(ColourPickerWindow).y);
+                    ColourPickerColour = ColourPickerImage.getPixel(sf::Mouse::getPosition(OutlineColourWindow).x, sf::Mouse::getPosition(OutlineColourWindow).y);
 
-                    g_CanvasManager.UpdateColour(ColourPickerColour);
+                    g_CanvasManager.UpdateColourOutline(ColourPickerColour);
                 }
             }
         }
@@ -166,32 +212,33 @@ int main()
 
         // Menu window event loop
         sf::Event MenuEvent;
-        while (MenuRenderWindow.pollEvent(MenuEvent))
+        while (MenuWindow.pollEvent(MenuEvent))
         {
             if (MenuEvent.type == sf::Event::Closed)
             {
                 // Show confirmation dialog
-                if (showConfirmationDialog(MenuRenderWindow)) // Call the function without any namespace prefix
+                if (showConfirmationDialog(MenuWindow))
                 {
-                    MenuRenderWindow.close();
+                    MenuWindow.close();
+                    CanvasWindow.close();
                 }
             }
         }
         //
 
-        MainCamera.CameraMove(MainRenderWindow);
+        MainCamera.CameraMove(CanvasWindow);
         
         // Set view
-        MainRenderWindow.setView(MainCamera.m_CameraView);
+        CanvasWindow.setView(MainCamera.m_CameraView);
 
 
         // Main window render loop
-        MainRenderWindow.clear();
+        CanvasWindow.clear();
 
         g_CanvasManager.SwapTool();
         g_Canvas->display();
 
-        MainRenderWindow.draw(g_CanvasObject);
+        CanvasWindow.draw(g_CanvasObject);
 
         g_CanvasManager.DrawUpdate();
 
@@ -200,34 +247,93 @@ int main()
             g_CanvasManager.ShapeCleanup();
         }
         
-        MainRenderWindow.display();
+        CanvasWindow.display();
         //
 
 
 
         // Options window render loop
-        ColourPickerWindow.clear(sf::Color::Blue); // Sets window colour
-
-        // for (int i = 0; i < UIElements.size(); i++)
-        // {
-        //     UIElements[i].Draw(&OptionsWindow);
-        // }
+        FillColourWindow.clear(sf::Color::Black); // Sets window colour
+        FillColourWindow.draw(ColourShape);
+        FillColourWindow.display();
 
 
-        ColourPickerWindow.draw(OptionsShape);
-
-        ColourPickerWindow.display();
+    	OutlineColourWindow.clear(sf::Color::Black); // Sets window colour
+        OutlineColourWindow.draw(ColourShape);
+        OutlineColourWindow.display();
         //
 
 
 
         // Menu window render loop
-        MenuRenderWindow.clear(sf::Color::Cyan); // Sets menu window color
+        MenuWindow.clear(sf::Color::Cyan); // Sets menu window color
 
-        // Draw your menu UI elements here
-        // ...
+        //Draw menu buttons
+        for (int i = 0; i < UIElements.size(); i++)
+        {
+            UIElements[i].Draw(&MenuWindow);
+        }
 
-        MenuRenderWindow.display();
+        for (int i = 0; i < UIElements.size(); i++) 
+        {
+            UIElements[i].Draw(&MenuWindow);
+        }
+        
+        
+        if (MenuEvent.type == sf::Event::MouseButtonPressed)
+        {
+            if (MenuEvent.mouseButton.button == sf::Mouse::Left)
+            {
+                for (int i = 0; i < UIElements.size(); i++)
+                {
+                    if (UIElements[i].m_ElementVisual.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
+                    {
+                        for (int j = 0; j < UIElements.size(); j++)
+                        {
+                            UIElements.at(j).IsActive = false;
+                        }
+
+                        UIElements[i].ButtonReact();
+                    }
+                }
+            }
+        }
+        // Menu buttons colour update
+        for (int i = 0; i < UIElements.size(); i++)
+        {
+
+            if (UIElements.at(i).IsActive)
+            {
+                UIElements.at(i).m_ElementText.setFillColor(sf::Color::Red);
+            }
+
+            else
+            {
+                UIElements.at(i).m_ElementText.setFillColor(sf::Color::Black);
+            }
+        }
+
+        if (MenuEvent.type == sf::Event::MouseButtonPressed && MenuEvent.mouseButton.button == sf::Mouse::Left) {
+            for (int i = 0; i < UIElements.size(); i++) 
+            {
+                if (UIElements[i].m_ElementVisual.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow)))) {
+                    UIElements[i].OutlineSizeButton(outlineSize); // Adjust outline size
+                }
+            }
+        }
+
+
+        sf::Text MenuTitle;
+        MenuTitle.setFont(*UIElementFont);
+        MenuTitle.setString("Tools:");
+        MenuTitle.setCharacterSize(40);
+        MenuTitle.setPosition(10, 5);
+
+        MenuWindow.draw(MenuTitle);
+
+        // Draw menu UI elements here
+        
+        MenuWindow.display();
         //
     }
 

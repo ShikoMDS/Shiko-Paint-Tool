@@ -144,14 +144,14 @@
     <ClCompile Include="src\GUI\Menu.cpp" />
     <ClCompile Include="src\GUI\UIElement.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Utensils\CanvasManager.cpp" />
+    <ClCompile Include="src\Utensils\ToolManager.cpp" />
     <ClCompile Include="src\Utensils\FileManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\GUI\Camera.h" />
     <ClInclude Include="include\GUI\Menu.h" />
     <ClInclude Include="include\GUI\UIElement.h" />
-    <ClInclude Include="include\Utensils\CanvasManager.h" />
+    <ClInclude Include="include\Utensils\ToolManager.h" />
     <ClInclude Include="include\Utensils\FileManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

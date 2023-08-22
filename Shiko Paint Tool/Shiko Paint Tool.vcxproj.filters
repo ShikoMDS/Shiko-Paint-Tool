@@ -29,7 +29,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utensils\CanvasManager.cpp">
+    <ClCompile Include="src\Utensils\ToolManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Utensils\FileManager.cpp">
@@ -52,7 +52,7 @@
     <ClInclude Include="include\GUI\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utensils\CanvasManager.h">
+    <ClInclude Include="include\Utensils\ToolManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Utensils\FileManager.h">

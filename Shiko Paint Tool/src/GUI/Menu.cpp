@@ -10,9 +10,9 @@ bool showConfirmationDialog(sf::RenderWindow& window)
     sf::Font font;
     font.loadFromFile("Resources/Fonts/Inkfree.ttf"); // Replace with the path to your font file
     confirmationText.setFont(font);
-    confirmationText.setString("Are you sure you want to quit?");
+    confirmationText.setString("Are you sure you want to quit?\nUnsaved changes will be lost.");
     confirmationText.setCharacterSize(20);
-    confirmationText.setPosition(20, 40);
+    confirmationText.setPosition(20, 20);
 
     sf::Text yesText;
     yesText.setFont(font);

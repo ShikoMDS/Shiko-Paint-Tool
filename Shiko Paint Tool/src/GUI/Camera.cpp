@@ -33,7 +33,7 @@ void Camera::CameraMove(sf::RenderWindow& window)
         sf::Vector2i currentMousePos = sf::Mouse::getPosition(window);
         sf::Vector2i mouseDelta = currentMousePos - m_PreviousMousePos;
 
-        m_CameraSpeed = -static_cast<sf::Vector2f>(mouseDelta) * 1.0f; // Notice the negative sign for inverted drag
+        m_CameraSpeed = -static_cast<sf::Vector2f>(mouseDelta) * 1.0f; // Negative sign for inverted drag
         m_PreviousMousePos = currentMousePos;
     }
 
