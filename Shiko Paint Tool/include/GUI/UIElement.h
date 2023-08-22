@@ -10,6 +10,20 @@ enum class ButtonType
 	Line
 };
 
+enum class NumButtons
+{
+	Number0,
+	Number1,
+	Number2,
+	Number3,
+	Number4,
+	Number5,
+	Number6,
+	Number7,
+	Number8,
+	Number9
+};
+
 class ToolManager;
 
 class UIElement
@@ -26,9 +40,10 @@ public:
 	void ButtonReact();
 	void Draw(sf::RenderWindow* _Window);
 
-	void OutlineSizeButton(float& outlineSize);
+	void OutlineSizeButton();
 
 	ButtonType CurrentButtonType;
+	NumButtons CurrentSize;
 	ToolManager* ToolManagerRef;
 	bool IsActive;
 };

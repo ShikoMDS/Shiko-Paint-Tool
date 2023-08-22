@@ -7,7 +7,7 @@ ToolManager::ToolManager(sf::RenderTexture* _CanvasRef, sf::RenderWindow* _Windo
     m_WindowRef = _WindowRef;
 
     m_LineThickness = 5.0f; // Set your desired line thickness
-    m_OutlineSize = 10.0f;
+    m_OutlineSize = 0.0f; // Default to 0
 
     m_CurrentShapeColour.r = 89;
     m_CurrentShapeColour.g = 89;
@@ -211,6 +211,60 @@ void ToolManager::SwapTool(ButtonType& _TypeInput)
     }
 }
 
+void ToolManager::SwapSize(NumButtons& _NumInput)
+{
+    if (_NumInput == NumButtons::Number0)
+    {
+        m_OutlineSize = 0;
+        UpdateOutlineSize();
+    }
+    if (_NumInput == NumButtons::Number1)
+    {
+        m_OutlineSize = 1;
+        UpdateOutlineSize();
+    }
+    if (_NumInput == NumButtons::Number2)
+    {
+        m_OutlineSize = 2;
+        UpdateOutlineSize();
+    }
+    if (_NumInput == NumButtons::Number3)
+    {
+        m_OutlineSize = 3;
+        UpdateOutlineSize();
+    }
+    if (_NumInput == NumButtons::Number4)
+    {
+        m_OutlineSize = 4;
+        UpdateOutlineSize();
+    }
+    if (_NumInput == NumButtons::Number5)
+    {
+        m_OutlineSize = 5;
+        UpdateOutlineSize();
+    }
+    if (_NumInput == NumButtons::Number6)
+    {
+        m_OutlineSize = 6;
+        UpdateOutlineSize();
+    }
+    if (_NumInput == NumButtons::Number7)
+    {
+        m_OutlineSize = 7;
+        UpdateOutlineSize();
+    }
+    if (_NumInput == NumButtons::Number8)
+    {
+        m_OutlineSize = 8;
+        UpdateOutlineSize();
+    }
+    if (_NumInput == NumButtons::Number9)
+    {
+        m_OutlineSize = 9;
+        UpdateOutlineSize();
+    }
+}
+
 
 void ToolManager::UpdateColourFill(sf::Color _NewColour)
 {
@@ -226,11 +280,11 @@ void ToolManager::UpdateColourOutline(sf::Color _NewColour)
     m_CurrentLine.setOutlineColor(_NewColour);
 }
 
-void ToolManager::UpdateOutlineSize(float _Size)
+void ToolManager::UpdateOutlineSize()
 {
-    m_CurrentRect.setOutlineThickness(_Size);
-    m_CurrentEllipse.setOutlineThickness(_Size);
-    m_CurrentLine.setOutlineThickness(_Size);
+    m_CurrentRect.setOutlineThickness(m_OutlineSize);
+    m_CurrentEllipse.setOutlineThickness(m_OutlineSize);
+    m_CurrentLine.setOutlineThickness(m_OutlineSize);
 }
 
 

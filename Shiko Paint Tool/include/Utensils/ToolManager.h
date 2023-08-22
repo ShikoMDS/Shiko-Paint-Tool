@@ -28,10 +28,11 @@ public:
     void DrawUpdate();
     void SwapTool();
     void SwapTool(ButtonType& _TypeInput);
+    void SwapSize(NumButtons& _NumInput);
 
     void UpdateColourFill(sf::Color _NewColour);
     void UpdateColourOutline(sf::Color _NewColour);
-    void UpdateOutlineSize(float _Size);
+    void UpdateOutlineSize();
 
     sf::Vector2f m_MouseStartPos;
     bool m_IsDrawing = false;

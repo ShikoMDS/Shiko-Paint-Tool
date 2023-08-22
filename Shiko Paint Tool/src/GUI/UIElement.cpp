@@ -41,16 +41,18 @@ void UIElement::Draw(sf::RenderWindow* _Window)
 	_Window->draw(m_ElementText);
 }
 
-void UIElement::OutlineSizeButton(float& outlineSize)
+void UIElement::OutlineSizeButton()
 {
-	if (IsActive) 
-	{
-		outlineSize = static_cast<float>(CurrentButtonType);
-	}
-	else 
-	{
-		outlineSize = 0.0f;
-	}
+	//if (IsActive) 
+	//{
+	//	outlineSize = static_cast<float>(CurrentSize);
+	//}
+	//else 
+	//{
+	//	outlineSize = 0.0f;
+	//}
+	ToolManagerRef->SwapSize(CurrentSize);
+	IsActive = IsActive ? false : true;
 	std::cout << std::string(m_ElementText.getString()) << std::endl;
 }
 

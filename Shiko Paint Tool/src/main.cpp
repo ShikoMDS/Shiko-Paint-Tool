@@ -15,7 +15,6 @@
 int main()
 {
     sf::Color ColourPickerColour;
-    float outlineSize = 0.0f;
 
     // Window renders ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //* Canvas window creation *//
@@ -92,7 +91,7 @@ int main()
 
     for (int i = 0; i < 4; i++)
     {
-        UIElement NewElement(sf::Vector2f(20, 70 + (i * 55)), sf::Vector2f(140, 35), ToolNames[static_cast<ButtonType>(i)] + '(' + std::to_string(i + 1) + ')', UIElementFont, &g_CanvasManager);
+        UIElement NewElement(sf::Vector2f(20, 240 + (i * 55)), sf::Vector2f(140, 35), ToolNames[static_cast<ButtonType>(i)] + '(' + std::to_string(i + 1) + ')', UIElementFont, &g_CanvasManager);
         UIElements.push_back(NewElement);
         UIElements.back().CurrentButtonType = static_cast<ButtonType>(i);
         UIElements.at(0).IsActive = true;
@@ -109,6 +108,51 @@ int main()
     {
         UIElements.at(i).CurrentButtonType = ButtonType.at(i);
     }
+
+
+    std::vector<UIElement> NumberButtons;
+
+    std::map<NumButtons, std::string> Size = {
+        {NumButtons::Number0, "  0"},
+        {NumButtons::Number1, "  1"},
+        {NumButtons::Number2, "  2"},
+        {NumButtons::Number3, "  3"},
+        {NumButtons::Number4, "  4"},
+        {NumButtons::Number5, "  5"},
+        {NumButtons::Number6, "  6"},
+        {NumButtons::Number7, "  7"},
+        {NumButtons::Number8, "  8"},
+        {NumButtons::Number9, "  9"},
+    };
+
+    for (int i = 0; i <= 9; i++) 
+    {
+        UIElement SizeElement(sf::Vector2f(180, 70 + (i * 55)), sf::Vector2f(40, 40), Size[static_cast<NumButtons>(i)], UIElementFont, &g_CanvasManager);
+    	NumberButtons.push_back(SizeElement);
+        NumberButtons.back().CurrentSize = static_cast<NumButtons>(i);
+        NumberButtons.at(0).IsActive = true;
+    }
+
+
+    std::vector<NumButtons>Button = 
+    {
+        NumButtons::Number0,
+        NumButtons::Number1,
+        NumButtons::Number2,
+        NumButtons::Number3,
+        NumButtons::Number4,
+        NumButtons::Number5,
+        NumButtons::Number6,
+        NumButtons::Number7,
+        NumButtons::Number8,
+        NumButtons::Number9
+    };
+
+    for (int i = 0; i < NumberButtons.size(); i++)
+    {
+        NumberButtons.at(i).CurrentSize = Button.at(i);
+    }
+
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     while (MenuWindow.isOpen())
@@ -274,11 +318,10 @@ int main()
             UIElements[i].Draw(&MenuWindow);
         }
 
-        for (int i = 0; i < UIElements.size(); i++) 
+        for (int i = 0; i < NumberButtons.size(); i++)
         {
-            UIElements[i].Draw(&MenuWindow);
+            NumberButtons[i].Draw(&MenuWindow);
         }
-        
         
         if (MenuEvent.type == sf::Event::MouseButtonPressed)
         {
@@ -294,6 +337,22 @@ int main()
                         }
 
                         UIElements[i].ButtonReact();
+                    }
+                }
+            }
+
+            if (MenuEvent.mouseButton.button == sf::Mouse::Left)
+            {
+                for (int i = 0; i < NumberButtons.size(); i++)
+                {
+                    if (NumberButtons[i].m_ElementVisual.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
+                    {
+                        for (int j = 0; j < NumberButtons.size(); j++)
+                        {
+                            NumberButtons.at(j).IsActive = false;
+                        }
+
+                        NumberButtons[i].OutlineSizeButton();
                     }
                 }
             }
@@ -313,23 +372,87 @@ int main()
             }
         }
 
-        if (MenuEvent.type == sf::Event::MouseButtonPressed && MenuEvent.mouseButton.button == sf::Mouse::Left) {
-            for (int i = 0; i < UIElements.size(); i++) 
+        for (int i = 0; i < NumberButtons.size(); i++)
+        {
+
+            if (NumberButtons.at(i).IsActive)
             {
-                if (UIElements[i].m_ElementVisual.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow)))) {
-                    UIElements[i].OutlineSizeButton(outlineSize); // Adjust outline size
-                }
+                NumberButtons.at(i).m_ElementText.setFillColor(sf::Color::Red);
+            }
+
+            else
+            {
+                NumberButtons.at(i).m_ElementText.setFillColor(sf::Color::Black);
             }
         }
 
+        sf::Text File;
+        File.setFont(*UIElementFont);
+        File.setFillColor(sf::Color::Black);
+        File.setString("File:");
+        File.setCharacterSize(40);
+        File.setPosition(10, 5);
 
-        sf::Text MenuTitle;
-        MenuTitle.setFont(*UIElementFont);
-        MenuTitle.setString("Tools:");
-        MenuTitle.setCharacterSize(40);
-        MenuTitle.setPosition(10, 5);
+        sf::Text Save;
+        Save.setFont(*UIElementFont);
+        Save.setFillColor(sf::Color::Black);
+        Save.setString("Save [F5]");
+        Save.setCharacterSize(24);
+        Save.setPosition(10, 60);
 
-        MenuWindow.draw(MenuTitle);
+        sf::Text Load;
+        Load.setFont(*UIElementFont);
+        Load.setFillColor(sf::Color::Black);
+        Load.setString("Load [F9]");
+        Load.setCharacterSize(24);
+        Load.setPosition(10, 100);
+
+        if (MenuEvent.mouseButton.button == sf::Mouse::Left)
+        {
+            if (Save.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
+            {
+                // Saving
+                g_Canvas->getTexture().copyToImage().saveToFile(g_FileManager.SaveFile() += ".png");
+            }
+        }
+
+        if (MenuEvent.mouseButton.button == sf::Mouse::Left)
+        {
+            if (Load.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
+            {
+                // Loading
+                sf::Texture NewTexture;
+                NewTexture.loadFromFile(g_FileManager.OpenFile());
+
+                sf::RectangleShape NewShape;
+                NewShape.setSize(sf::Vector2f(NewTexture.getSize().x, NewTexture.getSize().y));
+                NewShape.setTexture(&NewTexture);
+
+                g_Canvas->draw(NewShape);
+            }
+        }
+
+    	sf::Text Tools;
+        Tools.setFont(*UIElementFont);
+        Tools.setFillColor(sf::Color::Black);
+        Tools.setString("Tools:");
+        Tools.setCharacterSize(40);
+        Tools.setPosition(10, 175);
+
+    	sf::Text Outline;
+        Outline.setFont(*UIElementFont);
+        Outline.setFillColor(sf::Color::Black);
+        Outline.setString("Outline Size:");
+        Outline.setCharacterSize(40);
+        Outline.setPosition(180, 5);
+
+        //65
+
+        MenuWindow.draw(File);
+        MenuWindow.draw(Save);
+        MenuWindow.draw(Load);
+        MenuWindow.draw(Tools);
+        MenuWindow.draw(Outline);
 
         // Draw menu UI elements here
         
