@@ -27,7 +27,7 @@ int main()
 
 	//* Colour Picker window creation *//
     sf::RenderWindow FillColourWindow(sf::VideoMode(395, 390), "Fill Colour", sf::Style::Titlebar);
-    sf::RenderWindow OutlineColourWindow(sf::VideoMode(395, 390), "Outline Colour", sf::Style::Titlebar);
+    sf::RenderWindow OutlineColourWindow(sf::VideoMode(395, 390), "Line Colour", sf::Style::Titlebar);
     FillColourWindow.setVerticalSyncEnabled(true);
     OutlineColourWindow.setVerticalSyncEnabled(true);
 
@@ -442,7 +442,7 @@ int main()
     	sf::Text Outline;
         Outline.setFont(*UIElementFont);
         Outline.setFillColor(sf::Color::Black);
-        Outline.setString("Outline Size:");
+        Outline.setString("Line Size:");
         Outline.setCharacterSize(40);
         Outline.setPosition(180, 5);
 

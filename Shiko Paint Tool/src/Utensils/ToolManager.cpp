@@ -6,7 +6,7 @@ ToolManager::ToolManager(sf::RenderTexture* _CanvasRef, sf::RenderWindow* _Windo
     m_CanvasRef = _CanvasRef;
     m_WindowRef = _WindowRef;
 
-    m_LineThickness = 5.0f; // Set your desired line thickness
+    m_LineThickness = 0.0f; // Set your desired line thickness
     m_OutlineSize = 0.0f; // Default to 0
 
     m_CurrentShapeColour.r = 89;
