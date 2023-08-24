@@ -1,55 +1,69 @@
+/***********************************************************************
+Bachelor of Software Engineering
+Media Design School
+Auckland
+New Zealand
+
+(c) 2023 Media Design School
+
+File Name : ToolManager.h
+Description : Declaration of drawing tools
+Author : Shikomisen (Ayoub Ahmad)
+Mail : ayoub.ahmad@mds.ac.nz
+**************************************************************************/
+
 #pragma once
+
 #include <SFML/Graphics.hpp>
 
 #include "GUI/UIElement.h"
 
 enum ToolOptions
 {
-    Tool_None,
-    Tool_Rect,
-    Tool_Ellipse,
-    Tool_Line,
+    ToolNone,
+    ToolRect,
+    ToolEllipse,
+    ToolLine,
 };
 
 class ToolManager
 {
 public:
-    ToolManager(sf::RenderTexture* _CanvasRef, sf::RenderWindow* _WindowRef);
+    ToolManager(sf::RenderTexture* CanvasRef, sf::RenderWindow* WindowRef);
     ~ToolManager();
 
-    void InitShape(ToolOptions currentTool);
-    void DrawRect();
-    void DrawEllipse();
-    void DrawLine(); 
-    void EndDraw(ToolOptions _CurrentTool);
+    void initShape(ToolOptions CurrentTool);
+    void drawRect();
+    void drawEllipse();
+    void drawLine(); 
+    void endDraw(ToolOptions CurrentTool);
 
-    void ShapeCleanup();
+    void shapeCleanup();
+    void drawUpdate();
 
-    void DrawUpdate();
-    void SwapTool();
-    void SwapTool(ButtonType& _TypeInput);
-    void SwapSize(NumButtons& _NumInput);
+    void swapTool(const ButtonType& TypeInput);
+    void swapSize(const NumButtons& NumInput);
 
-    void UpdateColourFill(sf::Color _NewColour);
-    void UpdateColourOutline(sf::Color _NewColour);
-    void UpdateOutlineSize();
+    void updateColourFill(sf::Color NewColour);
+    void updateColourOutline(sf::Color NewColour);
+    void updateOutlineSize();
 
-    sf::Vector2f m_MouseStartPos;
-    bool m_IsDrawing = false;
+    sf::Vector2f MMouseStartPos;
+    bool MIsDrawing = false;
 
-    sf::Color m_CurrentShapeColour;
-    ToolOptions m_CurrentTool;
+    sf::Color MCurrentShapeColour;
+    ToolOptions MCurrentTool;
 
 private:
-    sf::RenderTexture* m_CanvasRef;
-    sf::RenderWindow* m_WindowRef;
+    sf::RenderTexture* MCanvasRef;
+    sf::RenderWindow* MWindowRef;
 
-    sf::RectangleShape m_CurrentRect;
-    sf::CircleShape m_CurrentEllipse;
-    sf::RectangleShape m_CurrentLine;
+    sf::RectangleShape MCurrentRect;
+    sf::CircleShape MCurrentEllipse;
+    sf::RectangleShape MCurrentLine;
 
-    sf::Vector2f m_CurrentMousePosf;
+    sf::Vector2f MCurrentMousePosf;
     
-    float m_LineThickness;
-    float m_OutlineSize;
+    float MLineThickness;
+    float MOutlineSize;
 };

@@ -1,3 +1,17 @@
+/***********************************************************************
+Bachelor of Software Engineering
+Media Design School
+Auckland
+New Zealand
+
+(c) 2023 Media Design School
+
+File Name : UIElement.h
+Description : Declaration of UI related features
+Author : Shikomisen (Ayoub Ahmad)
+Mail : ayoub.ahmad@mds.ac.nz
+**************************************************************************/
+
 #pragma once
 
 #include "SFML/Graphics.hpp"
@@ -21,26 +35,34 @@ enum class NumButtons
 	Number6,
 	Number7,
 	Number8,
-	Number9
+	Number9,
+	Number10,
+	Number11,
+	Number12,
+	Number13,
+	Number14,
+	Number15,
+	Number16,
+	Number17,
+	Number18,
+	Number19
 };
 
 class ToolManager;
 
-class UIElement
+class UiElement
 {
 public:
-	sf::RectangleShape m_ElementVisual;
-	std::string m_ElementID;
+	UiElement(sf::Vector2f Position, sf::Vector2f Size, const std::string& Id, const sf::Font* FontRef, ToolManager* ToolManager);
+	~UiElement();
 
-	sf::Text m_ElementText;
+	void buttonReact();
+	void draw(sf::RenderWindow* Window) const;
+	void outlineSizeButton();
 
-	UIElement(sf::Vector2f _Position, sf::Vector2f _Size, std::string _ID, sf::Font* _FontRef, ToolManager* _ToolManager);
-	~UIElement();
-
-	void ButtonReact();
-	void Draw(sf::RenderWindow* _Window);
-
-	void OutlineSizeButton();
+	sf::RectangleShape MElementVisual;
+	std::string MElementId;
+	sf::Text MElementText;
 
 	ButtonType CurrentButtonType;
 	NumButtons CurrentSize;

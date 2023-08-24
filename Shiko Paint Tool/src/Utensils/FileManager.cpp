@@ -1,53 +1,64 @@
+/***********************************************************************
+Bachelor of Software Engineering
+Media Design School
+Auckland
+New Zealand
+
+(c) 2023 Media Design School
+
+File Name : FileManager.cpp
+Description : Implementation of file managing systems
+Author : Shikomisen (Ayoub Ahmad)
+Mail : ayoub.ahmad@mds.ac.nz
+**************************************************************************/
+
 #include "Utensils/FileManager.h"
 
-FileManager::FileManager(HWND _Handle)
+FileManager::FileManager(const HWND Handle)
 {
 	// Clear and initialise memory for OFN
-	ZeroMemory(&m_OFN, sizeof(m_OFN));
-	m_OFN.lStructSize = sizeof(m_OFN);
+	ZeroMemory(&MOfn, sizeof(MOfn));
+	MOfn.lStructSize = sizeof(MOfn);
 
 	// Load the handle parameter and set to the member
-	m_Hwnd = _Handle;
+	MHwnd = Handle;
 
 	// Set the open filename owner
-	m_OFN.hwndOwner = m_Hwnd;
+	MOfn.hwndOwner = MHwnd;
 
 	// Initialise a string as empty, then null the first element
-	m_OFN.lpstrFile = (LPWSTR)szFile;
-	m_OFN.lpstrFile[0] = '\0';
-	m_OFN.nMaxFile = sizeof(szFile);
+	MOfn.lpstrFile = reinterpret_cast<LPWSTR>(SzFile);
+	MOfn.lpstrFile[0] = '\0';
+	MOfn.nMaxFile = sizeof(SzFile);
 
-	std::string DefaultName("Untitled");
+	const std::string DefaultName("Untitled");
 
 	for (int i = 0; i < DefaultName.size(); i++)
 	{
-		m_OFN.lpstrFile[i] = DefaultName[i];
+		MOfn.lpstrFile[i] = DefaultName[i];
 	}
 
 	// Change file filters to change what image types we can see or save to
-	m_OFN.lpstrFilter = L"Portable Network Graphic (PNG)\0*.png\0All\0*.*\0";
+	MOfn.lpstrFilter = L"Portable Network Graphic (PNG)\0*.png\0All\0*.*\0";
 
 	// What do these do idk?
-	m_OFN.nFilterIndex = 1;
+	MOfn.nFilterIndex = 1;
 
-	m_OFN.lpstrFileTitle = NULL;
-	m_OFN.nMaxFileTitle = 0;
-	m_OFN.lpstrInitialDir = NULL;
+	MOfn.lpstrFileTitle = nullptr;
+	MOfn.nMaxFileTitle = 0;
+	MOfn.lpstrInitialDir = nullptr;
 
-	m_OFN.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+	MOfn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
 }
 
-FileManager::~FileManager()
-{
+FileManager::~FileManager() = default;
 
-}
-
-std::string FileManager::OpenFile()
+std::string FileManager::openFile()
 {
-	if (GetOpenFileName(&m_OFN) == true)
+	if (GetOpenFileName(&MOfn) == true)
 	{
-		std::wstring ws(m_OFN.lpstrFile);
-		return std::string(ws.begin(), ws.end());
+		std::wstring Ws(MOfn.lpstrFile);
+		return std::string(Ws.begin(), Ws.end());
 	}
 
 	else
@@ -56,12 +67,12 @@ std::string FileManager::OpenFile()
 	}
 }
 
-std::string FileManager::SaveFile()
+std::string FileManager::saveFile()
 {
-	if (GetSaveFileName(&m_OFN) == true)
+	if (GetSaveFileName(&MOfn) == true)
 	{
-		std::wstring ws(m_OFN.lpstrFile);
-		return std::string(ws.begin(), ws.end());
+		std::wstring Ws(MOfn.lpstrFile);
+		return std::string(Ws.begin(), Ws.end());
 	}
 
 	else

@@ -1,166 +1,185 @@
-#include "Utensils/ToolManager.h"
+/***********************************************************************
+Bachelor of Software Engineering
+Media Design School
+Auckland
+New Zealand
+
+(c) 2023 Media Design School
+
+File Name : ToolManager.cpp
+Description : Implementation of drawing tools
+Author : Shikomisen (Ayoub Ahmad)
+Mail : ayoub.ahmad@mds.ac.nz
+**************************************************************************/
+
 #include <cmath>
 
-ToolManager::ToolManager(sf::RenderTexture* _CanvasRef, sf::RenderWindow* _WindowRef)
+#include "Utensils/ToolManager.h"
+
+ToolManager::ToolManager(sf::RenderTexture* CanvasRef, sf::RenderWindow* WindowRef)
 {
-    m_CanvasRef = _CanvasRef;
-    m_WindowRef = _WindowRef;
+    MCurrentTool = ToolNone;
 
-    m_LineThickness = 0.0f; // Set your desired line thickness
-    m_OutlineSize = 0.0f; // Default to 0
+	MCanvasRef = CanvasRef;
+	MWindowRef = WindowRef;
 
-    m_CurrentShapeColour.r = 89;
-    m_CurrentShapeColour.g = 89;
-    m_CurrentShapeColour.b = 89;
+	MLineThickness = 0.0f; // Default to 0
+	MOutlineSize = 0.0f; // Default to 0
 
-    m_CurrentRect.setFillColor(m_CurrentShapeColour);
-    m_CurrentEllipse.setFillColor(m_CurrentShapeColour);
-    m_CurrentLine.setFillColor(m_CurrentShapeColour); // Initialize line color
+	// Default fill colour grey
+	MCurrentShapeColour.r = 89;
+	MCurrentShapeColour.g = 89;
+	MCurrentShapeColour.b = 89;
 
-	m_CurrentRect.setOutlineColor(m_CurrentShapeColour);
-    m_CurrentEllipse.setOutlineColor(m_CurrentShapeColour);
-    m_CurrentLine.setOutlineColor(m_CurrentShapeColour); 
+	MCurrentRect.setFillColor(MCurrentShapeColour);
+	MCurrentEllipse.setFillColor(MCurrentShapeColour);
+	MCurrentLine.setFillColor(MCurrentShapeColour);
 
-    m_CurrentRect.setOutlineThickness(m_OutlineSize);
-    m_CurrentEllipse.setOutlineThickness(m_OutlineSize);
-    m_CurrentLine.setOutlineThickness(m_OutlineSize);
-    
+	MCurrentRect.setOutlineColor(sf::Color::Black);
+	MCurrentEllipse.setOutlineColor(sf::Color::Black);
+	MCurrentLine.setOutlineColor(sf::Color::Black);
+
+	MCurrentRect.setOutlineThickness(MOutlineSize);
+	MCurrentEllipse.setOutlineThickness(MOutlineSize);
+	MCurrentLine.setOutlineThickness(MOutlineSize);
 }
 
+ToolManager::~ToolManager() = default;
 
-ToolManager::~ToolManager()
-{
-
-}
-
-void ToolManager::InitShape(ToolOptions currentTool)
+void ToolManager::initShape(const ToolOptions CurrentTool)
 {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
     {
-        m_MouseStartPos = m_WindowRef->mapPixelToCoords(sf::Mouse::getPosition(*m_WindowRef));
+        MMouseStartPos = MWindowRef->mapPixelToCoords(sf::Mouse::getPosition(*MWindowRef));
 
-        switch (currentTool)
+        switch (CurrentTool)
         {
-        case ToolOptions::Tool_Rect:
-            m_CurrentRect.setPosition(m_MouseStartPos);
-            m_IsDrawing = true;
+        case ToolRect:
+            MCurrentRect.setPosition(MMouseStartPos);
+            MIsDrawing = true;
             break;
-        case ToolOptions::Tool_Ellipse:
-            m_CurrentEllipse.setPosition(m_MouseStartPos);
-            m_IsDrawing = true;
+        case ToolEllipse:
+            MCurrentEllipse.setPosition(MMouseStartPos);
+            MIsDrawing = true;
             break;
-        case ToolOptions::Tool_Line:
-            m_CurrentLine.setPosition(m_MouseStartPos);
-            m_IsDrawing = true;
+        case ToolLine:
+            MCurrentLine.setPosition(MMouseStartPos);
+            MIsDrawing = true;
             break;
-            // ... handle other tools
+		case ToolNone: 
+            break;
+		default: 
+            break;
         }
     }
 }
 
-void ToolManager::DrawRect()
+void ToolManager::drawRect()
 {
-    m_CurrentMousePosf = m_WindowRef->mapPixelToCoords(sf::Mouse::getPosition(*m_WindowRef));
-    sf::Vector2f Distance = -(m_MouseStartPos - m_CurrentMousePosf);
+    MCurrentMousePosf = MWindowRef->mapPixelToCoords(sf::Mouse::getPosition(*MWindowRef));
+    const sf::Vector2f Distance = -(MMouseStartPos - MCurrentMousePosf);
 
-    m_CurrentRect.setSize(Distance);
+    MCurrentRect.setSize(Distance);
 
-    m_WindowRef->draw(m_CurrentRect);
+    MWindowRef->draw(MCurrentRect);
 }
 
-void ToolManager::DrawEllipse()
+void ToolManager::drawEllipse()
 {
-    m_CurrentMousePosf = m_WindowRef->mapPixelToCoords(sf::Mouse::getPosition(*m_WindowRef));
-    sf::Vector2f Distance = m_CurrentMousePosf - m_MouseStartPos;
+    MCurrentMousePosf = MWindowRef->mapPixelToCoords(sf::Mouse::getPosition(*MWindowRef));
+    const sf::Vector2f Distance = MCurrentMousePosf - MMouseStartPos;
 
-    float radiusX = std::abs(Distance.x) / 2.0f;
-    float radiusY = std::abs(Distance.y) / 2.0f;
-    m_CurrentEllipse.setRadius(radiusX); // Set radius to half of X distance
-    m_CurrentEllipse.setScale(1.0f, radiusY / radiusX); // Scale the Y axis based on aspect ratio
+    const float RadiusX = std::abs(Distance.x) / 2.0f;
+    const float RadiusY = std::abs(Distance.y) / 2.0f;
+    MCurrentEllipse.setRadius(RadiusX); // Set radius to half of X distance
+    MCurrentEllipse.setScale(1.0f, RadiusY / RadiusX); // Scale the Y axis based on aspect ratio
 
     // Calculate the center of the ellipse based on origin and current mouse position
-    sf::Vector2f center = m_MouseStartPos + Distance / 2.0f;
-    m_CurrentEllipse.setPosition(center - sf::Vector2f(radiusX, radiusY));
+    const sf::Vector2f Center = MMouseStartPos + Distance / 2.0f;
+    MCurrentEllipse.setPosition(Center - sf::Vector2f(RadiusX, RadiusY));
 
-    m_WindowRef->draw(m_CurrentEllipse);
+    MWindowRef->draw(MCurrentEllipse);
 }
 
-void ToolManager::DrawLine()
+void ToolManager::drawLine()
 {
-    m_CurrentMousePosf = m_WindowRef->mapPixelToCoords(sf::Mouse::getPosition(*m_WindowRef));
+    MCurrentMousePosf = MWindowRef->mapPixelToCoords(sf::Mouse::getPosition(*MWindowRef));
 
-    sf::Vector2f distance = m_CurrentMousePosf - m_MouseStartPos;
+    const sf::Vector2f Distance = MCurrentMousePosf - MMouseStartPos;
 
-    float length = std::sqrt(distance.x * distance.x + distance.y * distance.y);
-    float angle = std::atan2(distance.y, distance.x) * 180.0f / static_cast<float>(std::acos(-1.0)); // Use std::acos(-1.0) for pi
+    const float Length = std::sqrt(Distance.x * Distance.x + Distance.y * Distance.y);
+    const float Angle = std::atan2(Distance.y, Distance.x) * 180.0f / static_cast<float>(std::acos(-1.0)); // Use std::acos(-1.0) for pi
 
-    m_CurrentLine.setSize(sf::Vector2f(length, m_LineThickness));
-    m_CurrentLine.setRotation(angle);
-    m_CurrentLine.setPosition(m_MouseStartPos);
+    MCurrentLine.setSize(sf::Vector2f(Length, MLineThickness));
+    MCurrentLine.setRotation(Angle);
+    MCurrentLine.setPosition(MMouseStartPos);
 
-    m_WindowRef->draw(m_CurrentLine);
+    MWindowRef->draw(MCurrentLine);
 }
 
-void ToolManager::EndDraw(ToolOptions _CurrentTool)
+void ToolManager::endDraw(const ToolOptions CurrentTool)
 {
-    if (m_IsDrawing)
+    if (MIsDrawing)
     {
-        switch (_CurrentTool)
+        switch (CurrentTool)
         {
-        case ToolOptions::Tool_Rect:
-            m_CanvasRef->draw(m_CurrentRect);
+        case ToolRect:
+            MCanvasRef->draw(MCurrentRect);
             break;
-        case ToolOptions::Tool_Ellipse:
-            m_CanvasRef->draw(m_CurrentEllipse);
+        case ToolEllipse:
+            MCanvasRef->draw(MCurrentEllipse);
             break;
-        case ToolOptions::Tool_Line: // Add this case
-            m_CanvasRef->draw(m_CurrentLine);
+        case ToolLine: 
+            MCanvasRef->draw(MCurrentLine);
             break;
-            // ... handle other tools
+        case ToolNone:
+            break;
+		default: 
+            break;
         }
 
-        m_CanvasRef->display();
-        m_IsDrawing = false;
+        MCanvasRef->display();
+        MIsDrawing = false;
     }
 }
 
-void ToolManager::ShapeCleanup()
+void ToolManager::shapeCleanup()
 {
-    m_CurrentRect.setSize(sf::Vector2f(0.0f, 0.0f));
-    m_CurrentRect.setPosition(-10000, -10000);
-    m_CurrentEllipse.setRadius(0.0f); // Reset ellipse radius
-    m_CurrentEllipse.setPosition(-10000, -10000);
-    m_CurrentLine.setSize(sf::Vector2f(0.0f, 0.0f));
-    m_CurrentLine.setPosition(-10000, -10000);
+    MCurrentRect.setSize(sf::Vector2f(0.0f, 0.0f));
+    MCurrentRect.setPosition(-10000, -10000);
+    MCurrentEllipse.setRadius(0.0f); // Reset ellipse radius
+    MCurrentEllipse.setPosition(-10000, -10000);
+    MCurrentLine.setSize(sf::Vector2f(0.0f, 0.0f));
+    MCurrentLine.setPosition(-10000, -10000);
 }
 
-void ToolManager::DrawUpdate()
+void ToolManager::drawUpdate()
 {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
     {
-        m_IsDrawing = false;
+        MIsDrawing = false;
     }
 
-    switch (m_CurrentTool)
+    switch (MCurrentTool)
     {
-    case Tool_None:
+    case ToolNone:
         break;
-    case Tool_Rect:
-        if (m_IsDrawing && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    case ToolRect:
+        if (MIsDrawing && sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            DrawRect();
+            drawRect();
         }
         break;
-    case Tool_Ellipse:
-        if (m_IsDrawing && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    case ToolEllipse:
+        if (MIsDrawing && sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            DrawEllipse();
+            drawEllipse();
         }
         break;
-    case Tool_Line:
-        if (m_IsDrawing && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    case ToolLine:
+        if (MIsDrawing && sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            DrawLine();
+            drawLine();
         }
         break;
     default:
@@ -168,124 +187,148 @@ void ToolManager::DrawUpdate()
     }
 }
 
-void ToolManager::SwapTool()
+void ToolManager::swapTool(const ButtonType& TypeInput)
 {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+    if (TypeInput == ButtonType::Pointer)
     {
-        m_CurrentTool = ToolOptions::Tool_None;
+        MCurrentTool = ToolNone;
     }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+    if (TypeInput == ButtonType::Box)
     {
-        m_CurrentTool = ToolOptions::Tool_Rect;
+        MCurrentTool = ToolRect;
     }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
+    if (TypeInput == ButtonType::Ellipse)
     {
-        m_CurrentTool = ToolOptions::Tool_Ellipse;
+        MCurrentTool = ToolEllipse;
     }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4)) 
+    if (TypeInput == ButtonType::Line)
     {
-        m_CurrentTool = ToolOptions::Tool_Line;
+        MCurrentTool = ToolLine;
     }
 }
 
-void ToolManager::SwapTool(ButtonType& _TypeInput)
+void ToolManager::swapSize(const NumButtons& NumInput)
 {
-    if (_TypeInput == ButtonType::Pointer)
+    if (NumInput == NumButtons::Number0)
     {
-        m_CurrentTool = ToolOptions::Tool_None;
+        MOutlineSize = 0;
+        updateOutlineSize();
     }
-    if (_TypeInput == ButtonType::Box)
+    if (NumInput == NumButtons::Number1)
     {
-        m_CurrentTool = ToolOptions::Tool_Rect;
+        MOutlineSize = 1;
+        updateOutlineSize();
     }
-    if (_TypeInput == ButtonType::Ellipse)
+    if (NumInput == NumButtons::Number2)
     {
-        m_CurrentTool = ToolOptions::Tool_Ellipse;
+        MOutlineSize = 2;
+        updateOutlineSize();
     }
-    if (_TypeInput == ButtonType::Line)
+    if (NumInput == NumButtons::Number3)
     {
-        m_CurrentTool = ToolOptions::Tool_Line;
+        MOutlineSize = 3;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number4)
+    {
+        MOutlineSize = 4;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number5)
+    {
+        MOutlineSize = 5;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number6)
+    {
+        MOutlineSize = 6;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number7)
+    {
+        MOutlineSize = 7;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number8)
+    {
+        MOutlineSize = 8;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number9)
+    {
+        MOutlineSize = 9;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number10)
+    {
+        MOutlineSize = 10;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number11)
+    {
+        MOutlineSize = 11;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number12)
+    {
+        MOutlineSize = 12;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number13)
+    {
+        MOutlineSize = 13;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number14)
+    {
+        MOutlineSize = 14;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number15)
+    {
+        MOutlineSize = 15;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number16)
+    {
+        MOutlineSize = 16;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number17)
+    {
+        MOutlineSize = 17;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number18)
+    {
+        MOutlineSize = 18;
+        updateOutlineSize();
+    }
+    if (NumInput == NumButtons::Number19)
+    {
+        MOutlineSize = 19;
+        updateOutlineSize();
     }
 }
 
-void ToolManager::SwapSize(NumButtons& _NumInput)
+
+void ToolManager::updateColourFill(const sf::Color NewColour)
 {
-    if (_NumInput == NumButtons::Number0)
-    {
-        m_OutlineSize = 0;
-        UpdateOutlineSize();
-    }
-    if (_NumInput == NumButtons::Number1)
-    {
-        m_OutlineSize = 1;
-        UpdateOutlineSize();
-    }
-    if (_NumInput == NumButtons::Number2)
-    {
-        m_OutlineSize = 2;
-        UpdateOutlineSize();
-    }
-    if (_NumInput == NumButtons::Number3)
-    {
-        m_OutlineSize = 3;
-        UpdateOutlineSize();
-    }
-    if (_NumInput == NumButtons::Number4)
-    {
-        m_OutlineSize = 4;
-        UpdateOutlineSize();
-    }
-    if (_NumInput == NumButtons::Number5)
-    {
-        m_OutlineSize = 5;
-        UpdateOutlineSize();
-    }
-    if (_NumInput == NumButtons::Number6)
-    {
-        m_OutlineSize = 6;
-        UpdateOutlineSize();
-    }
-    if (_NumInput == NumButtons::Number7)
-    {
-        m_OutlineSize = 7;
-        UpdateOutlineSize();
-    }
-    if (_NumInput == NumButtons::Number8)
-    {
-        m_OutlineSize = 8;
-        UpdateOutlineSize();
-    }
-    if (_NumInput == NumButtons::Number9)
-    {
-        m_OutlineSize = 9;
-        UpdateOutlineSize();
-    }
+    MCurrentRect.setFillColor(NewColour);
+    MCurrentEllipse.setFillColor(NewColour);
+    MCurrentLine.setFillColor(NewColour);
 }
 
-
-void ToolManager::UpdateColourFill(sf::Color _NewColour)
+void ToolManager::updateColourOutline(const sf::Color NewColour)
 {
-    m_CurrentRect.setFillColor(_NewColour);
-    m_CurrentEllipse.setFillColor(_NewColour);
-    m_CurrentLine.setFillColor(_NewColour);
+    MCurrentRect.setOutlineColor(NewColour);
+    MCurrentEllipse.setOutlineColor(NewColour);
+    MCurrentLine.setOutlineColor(NewColour);
 }
 
-void ToolManager::UpdateColourOutline(sf::Color _NewColour)
+void ToolManager::updateOutlineSize()
 {
-    m_CurrentRect.setOutlineColor(_NewColour);
-    m_CurrentEllipse.setOutlineColor(_NewColour);
-    m_CurrentLine.setOutlineColor(_NewColour);
+    MCurrentRect.setOutlineThickness(MOutlineSize);
+    MCurrentEllipse.setOutlineThickness(MOutlineSize);
+    MCurrentLine.setOutlineThickness(MOutlineSize);
 }
-
-void ToolManager::UpdateOutlineSize()
-{
-    m_CurrentRect.setOutlineThickness(m_OutlineSize);
-    m_CurrentEllipse.setOutlineThickness(m_OutlineSize);
-    m_CurrentLine.setOutlineThickness(m_OutlineSize);
-}
-
-
-// 2 buttons to increase and decrease size, change value by 1 (clamp value 0-10)

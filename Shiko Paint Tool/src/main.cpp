@@ -1,3 +1,17 @@
+/***********************************************************************
+Bachelor of Software Engineering
+Media Design School
+Auckland
+New Zealand
+
+(c) 2023 Media Design School
+
+File Name : main.cpp
+Description : Main entry for Shiko Paint Tool
+Author : Shikomisen (Ayoub Ahmad)
+Mail : ayoub.ahmad@mds.ac.nz
+**************************************************************************/
+
 #include <iostream>
 
 #include <SFML/Graphics.hpp>
@@ -6,7 +20,8 @@
 
 #include "GUI/UIElement.h"
 #include "GUI/Camera.h"
-#include "GUI/Menu.h"
+#include "GUI/MenuOptions.h"
+
 #include "Utensils/ToolManager.h"
 #include "Utensils/FileManager.h"
 
@@ -21,7 +36,7 @@ int main()
     sf::RenderWindow CanvasWindow(sf::VideoMode(1600, 900), "Shiko Paint Tool");
     CanvasWindow.setFramerateLimit(60); // Sets to 60 fps
 
-	FileManager g_FileManager(CanvasWindow.getSystemHandle());
+	FileManager GFileManager(CanvasWindow.getSystemHandle());
     Camera MainCamera(sf::Vector2f(CanvasWindow.getSize().x / 2, CanvasWindow.getSize().y / 2), sf::Vector2f(CanvasWindow.getSize().x, CanvasWindow.getSize().y));
     //
 
@@ -35,36 +50,34 @@ int main()
     ColourShape.setSize(sf::Vector2f(FillColourWindow.getSize().x, FillColourWindow.getSize().y));
     ColourShape.setSize(sf::Vector2f(OutlineColourWindow.getSize().x, OutlineColourWindow.getSize().y));
     sf::Texture ColourTexture;
-    ColourTexture.loadFromFile("Resources/Images/Colours.png");
-    if (!ColourTexture.loadFromFile("Resources/Images/Colours.png"))
+    ColourTexture.loadFromFile("resources/Images/Colours.png");
+    if (!ColourTexture.loadFromFile("resources/Images/Colours.png"))
     {
         std::cout << "Failed to load colour selection tool!" << std::endl;
     }
     ColourShape.setTexture(&ColourTexture);
     sf::Image ColourPickerImage;
-    ColourPickerImage.loadFromFile("Resources/Images/Colours.png");
+    ColourPickerImage.loadFromFile("resources/Images/Colours.png");
     //
-    
 
     //* Menu window creation *//
-    sf::RenderWindow MenuWindow(sf::VideoMode(400, 900), "Menu", sf::Style::Close);
+    sf::RenderWindow MenuWindow(sf::VideoMode(375, 750), "Menu", sf::Style::Close);
     MenuWindow.setVerticalSyncEnabled(true);
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     
 
 
-
     // Canvas stuff ---------------------------------------------------------------------------------------
-    sf::RenderTexture* g_Canvas = new sf::RenderTexture();
-    g_Canvas->create(CanvasWindow.getSize().x, CanvasWindow.getSize().y);
-    g_Canvas->clear(sf::Color::White);
+    sf::RenderTexture* GCanvas = new sf::RenderTexture();
+    GCanvas->create(CanvasWindow.getSize().x, CanvasWindow.getSize().y);
+    GCanvas->clear(sf::Color::White);
 
-    sf::RectangleShape g_CanvasObject;
-    g_CanvasObject.setSize(sf::Vector2f(CanvasWindow.getSize().x, CanvasWindow.getSize().y));
-    g_CanvasObject.setTexture(&g_Canvas->getTexture());
+    sf::RectangleShape GCanvasObject;
+    GCanvasObject.setSize(sf::Vector2f(CanvasWindow.getSize().x, CanvasWindow.getSize().y));
+    GCanvasObject.setTexture(&GCanvas->getTexture());
 
     // Canvas manager init
-    ToolManager g_CanvasManager(g_Canvas, &CanvasWindow);
+    ToolManager GCanvasManager(GCanvas, &CanvasWindow);
     //
 
     // Delta time stuff
@@ -73,28 +86,29 @@ int main()
     //----------------------------------------------------------------------------------------------------
 
 
+
     // Menu buttons ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    sf::Font* UIElementFont = new sf::Font;
-    if (!UIElementFont->loadFromFile("Resources/Fonts/Inkfree.ttf"))
+    sf::Font* UiElementFont = new sf::Font;
+    if (!UiElementFont->loadFromFile("resources/Fonts/Inkfree.ttf"))
     {
         std::cout << "Error loading file" << std::endl;
     }
     
-    std::vector <UIElement> UIElements;
+    std::vector <UiElement> UiElements;
 
     std::map<ButtonType, std::string> ToolNames = {
-        {ButtonType::Pointer, "  Pointer "},
-        {ButtonType::Box, "    Box "},
-        {ButtonType::Ellipse, "   Ellipse "},
-        {ButtonType::Line, "    Line "},
+        {ButtonType::Pointer, "\t Pointer"},
+        {ButtonType::Box, "\t   Box"},
+        {ButtonType::Ellipse, "\t Ellipse"},
+        {ButtonType::Line, "\t   Line"},
     };
 
-    for (int i = 0; i < 4; i++)
+    for (int I = 0; I < 4; I++)
     {
-        UIElement NewElement(sf::Vector2f(20, 240 + (i * 55)), sf::Vector2f(140, 35), ToolNames[static_cast<ButtonType>(i)] + '(' + std::to_string(i + 1) + ')', UIElementFont, &g_CanvasManager);
-        UIElements.push_back(NewElement);
-        UIElements.back().CurrentButtonType = static_cast<ButtonType>(i);
-        UIElements.at(0).IsActive = true;
+        UiElement NewElement(sf::Vector2f(210, 65 + (I * 55)), sf::Vector2f(140, 35), ToolNames[static_cast<ButtonType>(I)], UiElementFont, &GCanvasManager);
+        UiElements.push_back(NewElement);
+        UiElements.back().CurrentButtonType = static_cast<ButtonType>(I);
+        UiElements.at(0).IsActive = true;
     }
 
     std::vector<ButtonType>ButtonType = {
@@ -104,13 +118,13 @@ int main()
         ButtonType::Line,
     };
     
-    for (int i = 0; i < UIElements.size(); i++)
+    for (int I = 0; I < UiElements.size(); I++)
     {
-        UIElements.at(i).CurrentButtonType = ButtonType.at(i);
+        UiElements.at(I).CurrentButtonType = ButtonType.at(I);
     }
 
 
-    std::vector<UIElement> NumberButtons;
+    std::vector<UiElement> NumberButtons;
 
     std::map<NumButtons, std::string> Size = {
         {NumButtons::Number0, "  0"},
@@ -125,11 +139,11 @@ int main()
         {NumButtons::Number9, "  9"},
     };
 
-    for (int i = 0; i <= 9; i++) 
+    for (int I = 0; I <= 9; I++) 
     {
-        UIElement SizeElement(sf::Vector2f(180, 70 + (i * 55)), sf::Vector2f(40, 40), Size[static_cast<NumButtons>(i)], UIElementFont, &g_CanvasManager);
+        UiElement SizeElement(sf::Vector2f(30, 190 + (I * 55)), sf::Vector2f(40, 40), Size[static_cast<NumButtons>(I)], UiElementFont, &GCanvasManager);
     	NumberButtons.push_back(SizeElement);
-        NumberButtons.back().CurrentSize = static_cast<NumButtons>(i);
+        NumberButtons.back().CurrentSize = static_cast<NumButtons>(I);
         NumberButtons.at(0).IsActive = true;
     }
 
@@ -148,11 +162,55 @@ int main()
         NumButtons::Number9
     };
 
-    for (int i = 0; i < NumberButtons.size(); i++)
+    for (int I = 0; I < NumberButtons.size(); I++)
     {
-        NumberButtons.at(i).CurrentSize = Button.at(i);
+        NumberButtons.at(I).CurrentSize = Button.at(I);
     }
 
+    std::vector<UiElement> NumberButtons2;
+
+    std::map<NumButtons, std::string> Size2 = {
+        {NumButtons::Number0, " 10"},
+        {NumButtons::Number1, " 11"},
+        {NumButtons::Number2, " 12"},
+        {NumButtons::Number3, " 13"},
+        {NumButtons::Number4, " 14"},
+        {NumButtons::Number5, " 15"},
+        {NumButtons::Number6, " 16"},
+        {NumButtons::Number7, " 17"},
+        {NumButtons::Number8, " 18"},
+        {NumButtons::Number9, " 19"},
+    };
+
+    for (int I = 0; I <= 9; I++)
+    {
+        UiElement SizeElement2(sf::Vector2f(100, 190 + (I * 55)), sf::Vector2f(40, 40), Size2[static_cast<NumButtons>(I)], UiElementFont, &GCanvasManager);
+        NumberButtons.push_back(SizeElement2);
+        NumberButtons.back().CurrentSize = static_cast<NumButtons>(I + 10);
+    }
+
+
+    std::vector<NumButtons>Button2 =
+    {
+        NumButtons::Number10,
+        NumButtons::Number11,
+        NumButtons::Number12,
+        NumButtons::Number13,
+        NumButtons::Number14,
+        NumButtons::Number15,
+        NumButtons::Number16,
+        NumButtons::Number17,
+        NumButtons::Number18,
+        NumButtons::Number19
+    };
+
+    for (int I = 0; I < NumberButtons2.size(); I++)
+    {
+        NumberButtons2.at(I).CurrentSize = Button2.at(I);
+    }
+
+
+    // *Learn how to use arrays and vectors properly to not duplicate code and keep it concise*
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     while (MenuWindow.isOpen())
@@ -161,15 +219,15 @@ int main()
 	    CurrentTime = DeltaClock.restart();
         DeltaTime = CurrentTime.asSeconds();
 
-        sf::Event CanvasEvent;
+        sf::Event CanvasEvent{};
         while (CanvasWindow.pollEvent(CanvasEvent))
         {
             if (CanvasEvent.type == sf::Event::Closed)
             {
-                if (showConfirmationDialog(CanvasWindow))
+                if (showConfirmationDialog(CanvasWindow, UiElementFont))
                 {
-                    CanvasWindow.close();
                     MenuWindow.close();
+                    CanvasWindow.close();
                 }
             }
 
@@ -179,23 +237,23 @@ int main()
                 {
                     if (CanvasEvent.mouseWheelScroll.delta < 0) // Scroll down to zoom out
                     {
-                        MainCamera.m_CameraView.zoom(1.1f); // Adjust this value to control zoom speed
+                        MainCamera.MCameraView.zoom(1.1f); // Adjust this value to control zoom speed
                     }
                     else if (CanvasEvent.mouseWheelScroll.delta > 0) // Scroll up to zoom in
                     {
-                        MainCamera.m_CameraView.zoom(0.9f); // Adjust this value to control zoom speed
+                        MainCamera.MCameraView.zoom(0.9f); // Adjust this value to control zoom speed
                     }
                 }
             }
 
             if (CanvasEvent.type == sf::Event::MouseButtonPressed && CanvasEvent.mouseButton.button == sf::Mouse::Left)
             {
-                g_CanvasManager.InitShape(g_CanvasManager.m_CurrentTool);
+                GCanvasManager.initShape(GCanvasManager.MCurrentTool);
             }
 
             if (CanvasEvent.type == sf::Event::MouseButtonReleased && CanvasEvent.mouseButton.button == sf::Mouse::Left)
             {
-                g_CanvasManager.EndDraw(g_CanvasManager.m_CurrentTool);
+                GCanvasManager.endDraw(GCanvasManager.MCurrentTool);
             }
 
             if (CanvasEvent.type == sf::Event::KeyPressed)
@@ -203,26 +261,28 @@ int main()
 	            if (CanvasEvent.key.code == sf::Keyboard::F5)
 	            {
                     // Saving
-                    g_Canvas->getTexture().copyToImage().saveToFile(g_FileManager.SaveFile() += ".png");
+                    std::cout << "Attempting to save..." << std::endl;
+                    GCanvas->getTexture().copyToImage().saveToFile(GFileManager.saveFile() += ".png");
 	            }
 
             	if (CanvasEvent.key.code == sf::Keyboard::F9)
 	            {
                     // Loading
+                    std::cout << "Attempting to load..." << std::endl;
                     sf::Texture NewTexture;
-                    NewTexture.loadFromFile(g_FileManager.OpenFile());
+                    NewTexture.loadFromFile(GFileManager.openFile());
 
                     sf::RectangleShape NewShape;
                     NewShape.setSize(sf::Vector2f(NewTexture.getSize().x, NewTexture.getSize().y));
                     NewShape.setTexture(&NewTexture);
 
-                    g_Canvas->draw(NewShape);
+                    GCanvas->draw(NewShape);
 	            }
             }
         }
 
         // Options window event loop
-        sf::Event ColourEvent;
+        sf::Event ColourEvent{};
         while (FillColourWindow.pollEvent(ColourEvent))
         {
             // Colour selection fill
@@ -232,12 +292,12 @@ int main()
                 {
                     ColourPickerColour = ColourPickerImage.getPixel(sf::Mouse::getPosition(FillColourWindow).x, sf::Mouse::getPosition(FillColourWindow).y);
 
-                    g_CanvasManager.UpdateColourFill(ColourPickerColour);
+                    GCanvasManager.updateColourFill(ColourPickerColour);
                 }
             }
         }
 
-    	sf::Event OutlineEvent;
+    	sf::Event OutlineEvent{};
         while (OutlineColourWindow.pollEvent(OutlineEvent))
         {
             // Colour selection ouline
@@ -247,54 +307,149 @@ int main()
                 {
                     ColourPickerColour = ColourPickerImage.getPixel(sf::Mouse::getPosition(OutlineColourWindow).x, sf::Mouse::getPosition(OutlineColourWindow).y);
 
-                    g_CanvasManager.UpdateColourOutline(ColourPickerColour);
+                    GCanvasManager.updateColourOutline(ColourPickerColour);
                 }
             }
         }
         //
 
 
+        sf::Text Save;
+        Save.setFont(*UiElementFont);
+        Save.setFillColor(sf::Color::Yellow);
+        Save.setString("Save [F5]");
+        Save.setCharacterSize(24);
+        Save.setPosition(10, 60);
+
+        sf::Text Load;
+        Load.setFont(*UiElementFont);
+        Load.setFillColor(sf::Color::Yellow);
+        Load.setString("Load [F9]");
+        Load.setCharacterSize(24);
+        Load.setPosition(10, 100);
+
         // Menu window event loop
-        sf::Event MenuEvent;
+        sf::Event MenuEvent{};
         while (MenuWindow.pollEvent(MenuEvent))
         {
             if (MenuEvent.type == sf::Event::Closed)
             {
-                // Show confirmation dialog
-                if (showConfirmationDialog(MenuWindow))
+                if (showConfirmationDialog(MenuWindow, UiElementFont))
                 {
                     MenuWindow.close();
                     CanvasWindow.close();
                 }
             }
+
+            if (MenuEvent.type == sf::Event::KeyPressed)
+            {
+                if (MenuEvent.key.code == sf::Keyboard::F5)
+                {
+                    // Saving
+                    std::cout << "Attempting to save..." << std::endl;
+                    GCanvas->getTexture().copyToImage().saveToFile(GFileManager.saveFile() += ".png");
+                }
+
+                if (MenuEvent.key.code == sf::Keyboard::F9)
+                {
+                    // Loading
+                    std::cout << "Attempting to load..." << std::endl;
+                    sf::Texture NewTexture;
+                    NewTexture.loadFromFile(GFileManager.openFile());
+
+                    sf::RectangleShape NewShape;
+                    NewShape.setSize(sf::Vector2f(NewTexture.getSize().x, NewTexture.getSize().y));
+                    NewShape.setTexture(&NewTexture);
+
+                    GCanvas->draw(NewShape);
+                }
+            }
+
+            if (MenuEvent.type == sf::Event::MouseButtonPressed)
+            {
+                if (MenuEvent.mouseButton.button == sf::Mouse::Left)
+                {
+                    for (int I = 0; I < UiElements.size(); I++)
+                    {
+                        if (UiElements[I].MElementVisual.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
+                        {
+                            for (auto& UiElement : UiElements)
+                            {
+                                UiElement.IsActive = false;
+                            }
+
+                            UiElements[I].buttonReact();
+                        }
+                    }
+                }
+
+                if (MenuEvent.mouseButton.button == sf::Mouse::Left)
+                {
+                    for (int I = 0; I < NumberButtons.size(); I++)
+                    {
+                        if (NumberButtons[I].MElementVisual.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
+                        {
+                            for (auto& NumberButton : NumberButtons)
+                            {
+                                NumberButton.IsActive = false;
+                            }
+
+                            NumberButtons[I].outlineSizeButton();
+                        }
+                    }
+                }
+            }
+
+            if (MenuEvent.mouseButton.button == sf::Mouse::Left)
+            {
+                if (Save.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
+                {
+                    // Saving
+                    std::cout << "Attempting to save..." << std::endl;
+                    GCanvas->getTexture().copyToImage().saveToFile(GFileManager.saveFile() += ".png");
+                }
+            }
+
+            if (MenuEvent.mouseButton.button == sf::Mouse::Left)
+            {
+                if (Load.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
+                {
+                    // Loading
+                    std::cout << "Attempting to load..." << std::endl;
+                    sf::Texture NewTexture;
+                    NewTexture.loadFromFile(GFileManager.openFile());
+
+                    sf::RectangleShape NewShape;
+                    NewShape.setSize(sf::Vector2f(NewTexture.getSize().x, NewTexture.getSize().y));
+                    NewShape.setTexture(&NewTexture);
+
+                    GCanvas->draw(NewShape);
+                }
+            }
         }
         //
 
-        MainCamera.CameraMove(CanvasWindow);
+        MainCamera.cameraMove(CanvasWindow);
         
         // Set view
-        CanvasWindow.setView(MainCamera.m_CameraView);
-
+        CanvasWindow.setView(MainCamera.MCameraView);
 
         // Main window render loop
         CanvasWindow.clear();
+        
+        GCanvas->display();
 
-        g_CanvasManager.SwapTool();
-        g_Canvas->display();
+        CanvasWindow.draw(GCanvasObject);
 
-        CanvasWindow.draw(g_CanvasObject);
+        GCanvasManager.drawUpdate();
 
-        g_CanvasManager.DrawUpdate();
-
-        if (!g_CanvasManager.m_IsDrawing)
+        if (!GCanvasManager.MIsDrawing)
         {
-            g_CanvasManager.ShapeCleanup();
+            GCanvasManager.shapeCleanup();
         }
         
         CanvasWindow.display();
         //
-
-
 
         // Options window render loop
         FillColourWindow.clear(sf::Color::Black); // Sets window colour
@@ -307,154 +462,117 @@ int main()
         OutlineColourWindow.display();
         //
 
-
-
         // Menu window render loop
-        MenuWindow.clear(sf::Color::Cyan); // Sets menu window color
+        MenuWindow.clear(sf::Color::Black); // Sets menu window color
 
         //Draw menu buttons
-        for (int i = 0; i < UIElements.size(); i++)
+        for (auto& UiElement : UiElements)
         {
-            UIElements[i].Draw(&MenuWindow);
+	        UiElement.draw(&MenuWindow);
         }
 
-        for (int i = 0; i < NumberButtons.size(); i++)
+        for (auto& NumberButton : NumberButtons)
         {
-            NumberButtons[i].Draw(&MenuWindow);
+	        NumberButton.draw(&MenuWindow);
         }
-        
-        if (MenuEvent.type == sf::Event::MouseButtonPressed)
-        {
-            if (MenuEvent.mouseButton.button == sf::Mouse::Left)
-            {
-                for (int i = 0; i < UIElements.size(); i++)
-                {
-                    if (UIElements[i].m_ElementVisual.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
-                    {
-                        for (int j = 0; j < UIElements.size(); j++)
-                        {
-                            UIElements.at(j).IsActive = false;
-                        }
 
-                        UIElements[i].ButtonReact();
-                    }
-                }
-            }
-
-            if (MenuEvent.mouseButton.button == sf::Mouse::Left)
-            {
-                for (int i = 0; i < NumberButtons.size(); i++)
-                {
-                    if (NumberButtons[i].m_ElementVisual.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
-                    {
-                        for (int j = 0; j < NumberButtons.size(); j++)
-                        {
-                            NumberButtons.at(j).IsActive = false;
-                        }
-
-                        NumberButtons[i].OutlineSizeButton();
-                    }
-                }
-            }
-        }
         // Menu buttons colour update
-        for (int i = 0; i < UIElements.size(); i++)
+        for (auto& UiElement : UiElements)
         {
 
-            if (UIElements.at(i).IsActive)
+            if (UiElement.IsActive)
             {
-                UIElements.at(i).m_ElementText.setFillColor(sf::Color::Red);
+	            UiElement.MElementText.setFillColor(sf::Color::Cyan);
             }
 
             else
             {
-                UIElements.at(i).m_ElementText.setFillColor(sf::Color::Black);
+	            UiElement.MElementText.setFillColor(sf::Color::Yellow);
             }
         }
 
-        for (int i = 0; i < NumberButtons.size(); i++)
+        for (auto& NumberButton : NumberButtons)
         {
 
-            if (NumberButtons.at(i).IsActive)
+            if (NumberButton.IsActive)
             {
-                NumberButtons.at(i).m_ElementText.setFillColor(sf::Color::Red);
+	            NumberButton.MElementText.setFillColor(sf::Color::Cyan);
             }
 
             else
             {
-                NumberButtons.at(i).m_ElementText.setFillColor(sf::Color::Black);
+	            NumberButton.MElementText.setFillColor(sf::Color::Yellow);
             }
         }
 
         sf::Text File;
-        File.setFont(*UIElementFont);
-        File.setFillColor(sf::Color::Black);
+        File.setFont(*UiElementFont);
+        File.setFillColor(sf::Color::Cyan);
         File.setString("File:");
         File.setCharacterSize(40);
         File.setPosition(10, 5);
 
-        sf::Text Save;
-        Save.setFont(*UIElementFont);
-        Save.setFillColor(sf::Color::Black);
-        Save.setString("Save [F5]");
-        Save.setCharacterSize(24);
-        Save.setPosition(10, 60);
-
-        sf::Text Load;
-        Load.setFont(*UIElementFont);
-        Load.setFillColor(sf::Color::Black);
-        Load.setString("Load [F9]");
-        Load.setCharacterSize(24);
-        Load.setPosition(10, 100);
-
-        if (MenuEvent.mouseButton.button == sf::Mouse::Left)
-        {
-            if (Save.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
-            {
-                // Saving
-                g_Canvas->getTexture().copyToImage().saveToFile(g_FileManager.SaveFile() += ".png");
-            }
-        }
-
-        if (MenuEvent.mouseButton.button == sf::Mouse::Left)
-        {
-            if (Load.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(MenuWindow))))
-            {
-                // Loading
-                sf::Texture NewTexture;
-                NewTexture.loadFromFile(g_FileManager.OpenFile());
-
-                sf::RectangleShape NewShape;
-                NewShape.setSize(sf::Vector2f(NewTexture.getSize().x, NewTexture.getSize().y));
-                NewShape.setTexture(&NewTexture);
-
-                g_Canvas->draw(NewShape);
-            }
-        }
-
     	sf::Text Tools;
-        Tools.setFont(*UIElementFont);
-        Tools.setFillColor(sf::Color::Black);
+        Tools.setFont(*UiElementFont);
+        Tools.setFillColor(sf::Color::Cyan);
         Tools.setString("Tools:");
         Tools.setCharacterSize(40);
-        Tools.setPosition(10, 175);
+        Tools.setPosition(200, 5);
 
     	sf::Text Outline;
-        Outline.setFont(*UIElementFont);
-        Outline.setFillColor(sf::Color::Black);
+        Outline.setFont(*UiElementFont);
+        Outline.setFillColor(sf::Color::Cyan);
         Outline.setString("Line Size:");
         Outline.setCharacterSize(40);
-        Outline.setPosition(180, 5);
+        Outline.setPosition(10, 135);
 
-        //65
+        sf::Text Draw;
+        Draw.setFont(*UiElementFont);
+        Draw.setFillColor(sf::Color::Cyan);
+        Draw.setString("Draw:");
+        Draw.setCharacterSize(40);
+        Draw.setPosition(200, 270);
+
+        sf::Text DrawControl;
+        DrawControl.setFont(*UiElementFont);
+        DrawControl.setFillColor(sf::Color::Magenta);
+        DrawControl.setString("\t[MB1]\n- Click and drag\nto draw\n\t[MB2]\n- Click to cancel\ndraw");
+        DrawControl.setCharacterSize(24);
+        DrawControl.setPosition(200, 315);
+
+        sf::Text Camera;
+        Camera.setFont(*UiElementFont);
+        Camera.setFillColor(sf::Color::Cyan);
+        Camera.setString("Camera:");
+        Camera.setCharacterSize(40);
+        Camera.setPosition(200, 490);
+
+        sf::Text Controls;
+        Controls.setFont(*UiElementFont);
+        Controls.setFillColor(sf::Color::Magenta);
+        Controls.setString("\t[MB3]\n- Scroll to zoom\n- Click and drag\nto move camera\nview");
+        Controls.setCharacterSize(24);
+        Controls.setPosition(200, 535);
+
+        sf::Text Credits;
+        Credits.setFont(*UiElementFont);
+        Credits.setFillColor(sf::Color::Cyan);
+        Credits.setString("Shikomisen (2023)");
+        Credits.setCharacterSize(24);
+        Credits.setPosition(160, 700);
 
         MenuWindow.draw(File);
         MenuWindow.draw(Save);
         MenuWindow.draw(Load);
         MenuWindow.draw(Tools);
         MenuWindow.draw(Outline);
+        MenuWindow.draw(Draw);
+        MenuWindow.draw(DrawControl);
+        MenuWindow.draw(Camera);
+        MenuWindow.draw(Controls);
+        MenuWindow.draw(Credits);
 
-        // Draw menu UI elements here
+        // *Next time make a text function for less lines*
         
         MenuWindow.display();
         //

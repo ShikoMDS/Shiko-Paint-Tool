@@ -102,6 +102,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%(ProjectDir)dependencies\SFML-2.6.0\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics-s.lib;sfml-window-s.lib;sfml-system-s.lib;sfml-audio-s.lib;opengl32.lib;freetype.lib;winmm.lib;gdi32.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <NoEntryPoint>false</NoEntryPoint>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -141,7 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GUI\Camera.cpp" />
-    <ClCompile Include="src\GUI\Menu.cpp" />
+    <ClCompile Include="src\GUI\MenuOptions.cpp" />
     <ClCompile Include="src\GUI\UIElement.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Utensils\ToolManager.cpp" />
@@ -149,7 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\GUI\Camera.h" />
-    <ClInclude Include="include\GUI\Menu.h" />
+    <ClInclude Include="include\GUI\MenuOptions.h" />
     <ClInclude Include="include\GUI\UIElement.h" />
     <ClInclude Include="include\Utensils\ToolManager.h" />
     <ClInclude Include="include\Utensils\FileManager.h" />

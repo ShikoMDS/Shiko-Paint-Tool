@@ -1,21 +1,36 @@
+/***********************************************************************
+Bachelor of Software Engineering
+Media Design School
+Auckland
+New Zealand
+
+(c) 2023 Media Design School
+
+File Name : FileManager.h
+Description : Declaration of file managing systems
+Author : Shikomisen (Ayoub Ahmad)
+Mail : ayoub.ahmad@mds.ac.nz
+**************************************************************************/
+
 #pragma once
+
+#include <string>
 #include <Windows.h>
 #include <ShObjIdl.h>
-#include <string>
 
 class FileManager
 {
 public:
-	FileManager(HWND _Handle);
+	explicit FileManager(HWND Handle);
 	~FileManager();
 
-	std::string OpenFile();
-	std::string SaveFile();
+	std::string openFile();
+	std::string saveFile();
 
 private:
-	OPENFILENAME m_OFN; // Variable holding information about loading or saving file
-	HWND m_Hwnd; // Handle current window
-	HANDLE m_hf; // Handle to a file
+	OPENFILENAME MOfn{}; // Variable holding information about loading or saving file
+	HWND MHwnd; // Handle current window
+	HANDLE MHf{}; // Handle to a file
 
-	char szFile[260]; // Array for filename + path
+	char SzFile[260]{}; // Array for filename + path
 };

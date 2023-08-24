@@ -1,18 +1,33 @@
+/***********************************************************************
+Bachelor of Software Engineering
+Media Design School
+Auckland
+New Zealand
+
+(c) 2023 Media Design School
+
+File Name : Camera.h
+Description : Declarations for camera related functions
+Author : Shikomisen (Ayoub Ahmad)
+Mail : ayoub.ahmad@mds.ac.nz
+**************************************************************************/
+
 #pragma once
+
 #include "SFML/Graphics.hpp"
 
 class Camera
 {
 public:
-	sf::View m_CameraView;
-	sf::Vector2f m_CameraSpeed;
-
-	Camera(sf::Vector2f _CameraPosition, sf::Vector2f _CameraSize);
+	Camera(sf::Vector2f CameraPosition, sf::Vector2f CameraSize);
 	~Camera();
 
-	void CameraMove(sf::RenderWindow& _Window);
+	void cameraMove(const sf::RenderWindow& Window);
+
+	sf::View MCameraView;
+	sf::Vector2f MCameraSpeed;
 
 private:
-	bool m_IsDragging;
-	sf::Vector2i m_PreviousMousePos;
+	bool MIsDragging{};
+	sf::Vector2i MPreviousMousePos;
 };
